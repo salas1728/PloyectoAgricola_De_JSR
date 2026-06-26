@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Horario e Información</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #0a2e1a 0%, #0d4a2a 50%, #1a6e3e 100%);
+      color: #fff;
+      padding: 30px 16px 60px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.85em;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: #fff; }
+
+    .page-header { text-align: center; margin-bottom: 40px; }
+    .badge {
+      display: inline-block;
+      background: rgba(76,208,125,0.15);
+      border: 1px solid rgba(76,208,125,0.35);
+      border-radius: 50px;
+      padding: 5px 18px;
+      font-size: 0.72em;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #a8e6b8;
+      margin-bottom: 14px;
+    }
+    .page-header h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, #a8e6b8 60%, #4cd07d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-title {
+      font-size: 1em;
+      font-weight: 700;
+      color: #a8e6b8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 40px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(168,230,184,0.25);
+    }
+
+    /* ── TABLA HORARIOS ── */
+    .table-wrapper {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+      margin-bottom: 12px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.95em; }
+
+    thead tr {
+      background: rgba(76,208,125,0.18);
+      border-bottom: 1px solid rgba(76,208,125,0.35);
+    }
+    thead th {
+      padding: 15px 20px;
+      text-align: left;
+      font-weight: 700;
+      color: #a8e6b8;
+      letter-spacing: 1px;
+      font-size: 0.82em;
+      text-transform: uppercase;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.2s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.05); }
+    tbody td { padding: 14px 20px; color: rgba(255,255,255,0.88); vertical-align: middle; }
+    tbody td:first-child { font-weight: 600; color: #fff; }
+
+    .estado-abierto {
+      display: inline-block;
+      background: rgba(76,208,125,0.2);
+      color: #4cd07d;
+      border: 1px solid rgba(76,208,125,0.4);
+      padding: 3px 12px;
+      border-radius: 50px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    .estado-cerrado {
+      display: inline-block;
+      background: rgba(255,100,100,0.15);
+      color: #ff9090;
+      border: 1px solid rgba(255,100,100,0.3);
+      padding: 3px 12px;
+      border-radius: 50px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+
+    /* ── MAPA ── */
+    .map-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+      margin-bottom: 14px;
+    }
+
+    .map-card-header {
+      padding: 18px 22px 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .map-card-header .address-info h3 {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .map-card-header .address-info p {
+      font-size: 0.85em;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .map-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #4cd07d;
+      color: #0a2e1a;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88em;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 22px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+    .map-btn:hover {
+      background: #3ab86a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76,208,125,0.3);
+    }
+
+    /* ── IFRAME MAPA ── */
+    .map-frame-wrapper {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .map-frame-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      border-radius: 0 0 18px 18px;
+      filter: saturate(0.8) brightness(0.85);
+      transition: filter 0.3s;
+    }
+    .map-frame-wrapper:hover iframe { filter: saturate(1) brightness(1); }
+
+    /* Overlay clickable encima del iframe */
+    .map-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,46,26,0.35);
+      transition: background 0.3s;
+    }
+    .map-overlay:hover { background: rgba(10,46,26,0.1); }
+
+    .map-overlay-btn {
+      background: rgba(76,208,125,0.92);
+      color: #0a2e1a;
+      font-weight: 700;
+      font-size: 0.95em;
+      padding: 12px 28px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+      pointer-events: none;
+    }
+
+    .nota-pie {
+      text-align: center;
+      font-size: 0.78em;
+      color: rgba(255,255,255,0.35);
+      margin-top: 8px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="cnv"></canvas>
+
+  <div class="content">
+    <a href="index.html" class="back-btn">← Regresar al inicio</a>
+
+    <div class="page-header">
+      <div class="badge">📅 Atención cliente</div>
+      <h1>Horario e Información</h1>
+    </div>
+
+    <!-- ── TABLA HORARIOS ── -->
+    <div class="section-title">🕐 Horario de atención</div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Día</th>
+            <th>Apertura</th>
+            <th>Cierre</th>
+            
+            <th>Notas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ✏️ EDITA TUS HORARIOS AQUÍ -->
+          <tr>
+            <td>Lunes</td>
+             <td>07:30 am</td>
+            <td>05:00 pm</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Martes</td>
+            <td>07:30 am</td>
+            <td>05:00 pm</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Miércoles</td>
+            <td>07:30 am</td>
+            <td>05:00 pm</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Jueves</td>
+             <td>07:30 am</td>
+            <td>05:00 pm</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Viernes</td>
+           <td>07:30 am</td>
+            <td>05:00 pm</td>
+             <td>—</td>
+          </tr>
+          <tr>
+            <td>Sábado</td>
+            <td>09:00 am</td>
+            <td>03:00 pm</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Domingo</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota-pie">* Horarios Sujetos a cambios en días festivos.</p>
+
+    <!-- ── UBICACIÓN / MAPA ── -->
+    <div class="section-title">📍 Nuestra ubicación</div>
+    <div class="map-card">
+      <div class="map-card-header">
+        <div class="address-info">
+          <!-- ✏️ CAMBIA AQUÍ LA DIRECCIÓN QUE QUIERES MOSTRAR -->
+          <h3>Asociacion Agricola de Juan Sebastian Roman / Xochimilco</h3>
+          <p>Calle 4 Pte., 75485 Xochimilco, Pue.</p>
+        </div>
+        <!--
+          ✏️ INSTRUCCIONES PARA PERSONALIZAR EL MAPA:
+          1. Ve a Google Maps y busca tu ubicación.
+          2. Haz clic en "Compartir" → "Insertar un mapa" y copia la URL del src del iframe.
+          3. Pega esa URL en el atributo src del <iframe> de abajo.
+          4. En el href del botón de abajo pon el link de Google Maps de tu ubicación
+             (el de "Compartir enlace", no el de insertar).
+        -->
+        <a id="gmaps-link"
+           href="https://maps.app.goo.gl/1gqcJwLD3uXjFDyHA"
+           target="_blank"
+           rel="noopener"
+           class="map-btn">
+          🗺️ Abrir en Google Maps
+        </a>
+      </div>
+
+      <!-- Al hacer clic en el overlay también se abre Google Maps -->
+      <div class="map-frame-wrapper" id="mapWrapper">
+        <div class="map-overlay" id="mapOverlay">
+          <div class="map-overlay-btn">📍 Toca para ir a Google Maps</div>
+        </div>
+        <!--
+          ✏️ PEGA AQUÍ LA URL DE "INSERTAR MAPA" DE GOOGLE MAPS
+          Ejemplo:
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!..."
+        -->
+        <iframe
+          id="mapIframe"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3776.1345576581816!2d-97.7317786261318!3d18.836683959444443!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c57ccd5a1af235%3A0xe26c5f74539e5023!2sCalle%204%20Pte.%2C%2075485%20Xochimilco%2C%20Pue.!5e0!3m2!1ses-419!2smx!4v1782451459961!5m2!1ses-419!2smx"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Mapa de ubicación">
+        </iframe>
+      </div>
+      
+    </div>
+    <p class="nota-pie">* preciona para abrir google maps.</p>
+
+  </div><!-- /content -->
+
+  <script>
+    /* ── CANVAS PARTÍCULAS ── */
+    const canvas = document.getElementById('cnv');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    function makeP() {
+      return {
+        x: Math.random()*W, y: Math.random()*H,
+        r: 1.5+Math.random()*3,
+        dx: (Math.random()-0.5)*0.5, dy: -(0.2+Math.random()*0.5),
+        alpha: 0.3+Math.random()*0.5, dA: (Math.random()-0.5)*0.004,
+        color: ['#4cd07d','#a8e6b8','#ffffff'][Math.floor(Math.random()*3)]
+      };
+    }
+    function init() { resize(); particles = Array.from({length:100}, makeP); }
+    function loop() {
+      ctx.clearRect(0,0,W,H);
+      for (const p of particles) {
+        p.x+=p.dx; p.y+=p.dy; p.alpha+=p.dA;
+        if (p.alpha<0.1||p.alpha>0.85) p.dA*=-1;
+        if (p.y<-10) { p.y=H+5; p.x=Math.random()*W; }
+        if (p.x<-10||p.x>W+10) { p.x=Math.random()*W; p.y=H; }
+        ctx.save(); ctx.globalAlpha=p.alpha;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.color; ctx.fill(); ctx.restore();
+      }
+      requestAnimationFrame(loop);
+    }
+    window.addEventListener('resize', init);
+    init(); loop();
+
+    /* ── CLICK EN MAPA ABRE GOOGLE MAPS ── */
+    const overlay = document.getElementById('mapOverlay');
+    const gmapsLink = document.getElementById('gmaps-link');
+    overlay.addEventListener('click', () => {
+      window.open(gmapsLink.href, '_blank');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Costos de Proyectos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #0a2e1a 0%, #0d4a2a 50%, #1a6e3e 100%);
+      color: #fff;
+      padding: 30px 16px 60px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.85em;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: #fff; }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .page-header .badge {
+      display: inline-block;
+      background: rgba(76,208,125,0.15);
+      border: 1px solid rgba(76,208,125,0.35);
+      border-radius: 50px;
+      padding: 5px 18px;
+      font-size: 0.72em;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #a8e6b8;
+      margin-bottom: 14px;
+    }
+    .page-header h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, #a8e6b8 60%, #4cd07d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      color: rgba(255,255,255,0.55);
+      font-size: 0.9em;
+      font-style: italic;
+    }
+
+    /* ── TABLA ── */
+    .table-wrapper {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95em;
+    }
+
+    thead tr {
+      background: rgba(76,208,125,0.18);
+      border-bottom: 1px solid rgba(76,208,125,0.35);
+    }
+
+    thead th {
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 700;
+      color: #a8e6b8;
+      letter-spacing: 1px;
+      font-size: 0.85em;
+      text-transform: uppercase;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.2s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.05); }
+
+    tbody td {
+      padding: 15px 20px;
+      color: rgba(255,255,255,0.88);
+      vertical-align: middle;
+    }
+
+    tbody td:first-child {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    tbody td.precio {
+      font-weight: 700;
+      color: #4cd07d;
+      font-size: 1.05em;
+    }
+
+    tbody td.nota {
+      font-size: 0.82em;
+      color: rgba(255,255,255,0.5);
+      font-style: italic;
+    }
+
+    .nota-pie {
+      text-align: center;
+      font-size: 0.8em;
+      color: rgba(255,255,255,0.4);
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    /* ── SECCIÓN MAQUINARIA ── */
+    .section-title {
+      font-size: 1.05em;
+      font-weight: 700;
+      color: #a8e6b8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 40px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(168,230,184,0.25);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="cnv"></canvas>
+
+  <div class="content">
+    <a href="index.html" class="back-btn">← Regresar al inicio</a>
+
+    <div class="page-header">
+      <div class="badge">💰 Tarifas 2026</div>
+      <h1>Costos de Proyectos Agricolas</h1>
+      <p>Los costos pueden variar según la zona y condiciones del terreno.</p>
+    </div>
+
+    <!-- TABLA 1: Renta por zona -->
+    <div class="section-title">📍 Precio por zona</div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Zona / Región</th>
+            <th>Precio por Hectárea</th>
+            <th>Notas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ✏️ AGREGA TUS DATOS AQUÍ – duplica las filas que necesites -->
+          <tr>
+            <td>1</td>
+            <td>— Zona por definir —</td>
+            <td class="precio">$0.00 MXN</td>
+            <td class="nota">—</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>— Zona por definir —</td>
+            <td class="precio">$0.00 MXN</td>
+            <td class="nota">—</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>— Zona por definir —</td>
+            <td class="precio">$0.00 MXN</td>
+            <td class="nota">—</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>— Zona por definir —</td>
+            <td class="precio">$0.00 MXN</td>
+            <td class="nota">—</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>— Zona por definir —</td>
+            <td class="precio">$0.00 MXN</td>
+            <td class="nota">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota-pie">*Consulte la disponibilidad.</p>
+
+    <!-- TABLA 2: Maquinaria -->
+    <div class="section-title">🚜 Costo por tipo de maquinaria</div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipo de Maquinaria</th>
+            <th>Costo / Hora</th>
+            <th>Costo / Hectárea</th>
+            <th>Notas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>— Por definir —</td>
+            <td class="precio">$0.00</td>
+            <td class="precio">$0.00</td>
+            <td class="nota">—</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>— Por definir —</td>
+            <td class="precio">$0.00</td>
+            <td class="precio">$0.00</td>
+            <td class="nota">—</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>— Por definir —</td>
+            <td class="precio">$0.00</td>
+            <td class="precio">$0.00</td>
+            <td class="nota">—</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>— Por definir —</td>
+            <td class="precio">$0.00</td>
+            <td class="precio">$0.00</td>
+            <td class="nota">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota-pie">* El Costo Incluye operador y combustible salvo indicación contraria.</p>
+
+  </div><!-- /content -->
+
+  <script>
+    const canvas = document.getElementById('cnv');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+    function makeP() {
+      return {
+        x: Math.random() * W, y: Math.random() * H,
+        r: 1.5 + Math.random() * 3,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: -(0.2 + Math.random() * 0.5),
+        alpha: 0.3 + Math.random() * 0.5,
+        dA: (Math.random() - 0.5) * 0.004,
+        color: ['#4cd07d','#a8e6b8','#ffffff'][Math.floor(Math.random()*3)]
+      };
+    }
+
+    function init() { resize(); particles = Array.from({length:100}, makeP); }
+
+    function loop() {
+      ctx.clearRect(0,0,W,H);
+      for (const p of particles) {
+        p.x += p.dx; p.y += p.dy; p.alpha += p.dA;
+        if (p.alpha < 0.1 || p.alpha > 0.85) p.dA *= -1;
+        if (p.y < -10) { p.y = H+5; p.x = Math.random()*W; }
+        if (p.x < -10 || p.x > W+10) { p.x = Math.random()*W; p.y = H; }
+        ctx.save(); ctx.globalAlpha = p.alpha;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = p.color; ctx.fill(); ctx.restore();
+      }
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', init);
+    init(); loop();
+  </script>
+</body>
+</html>

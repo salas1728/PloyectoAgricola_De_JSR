@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Proyectos Agrícolas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: linear-gradient(160deg, #0a2e1a 0%, #0d4a2a 40%, #1a6e3e 75%, #22913f 100%);
+      color: #fff;
+      text-align: center;
+      position: relative;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero {
+      z-index: 1;
+      padding: 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50px;
+      padding: 6px 20px;
+      font-size: 0.75em;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #a8e6b8;
+      margin-bottom: 18px;
+      backdrop-filter: blur(6px);
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 0%, #a8e6b8 50%, #4cd07d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+    }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.7);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      z-index: 1;
+    }
+
+    .btn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      padding: 22px 28px;
+      font-size: 0.95em;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      border-radius: 18px;
+      text-decoration: none;
+      transition: all 0.35s ease;
+      backdrop-filter: blur(10px);
+      min-width: 160px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .btn .icon {
+      font-size: 2em;
+      display: block;
+    }
+
+    .btn:hover {
+      transform: translateY(-6px);
+      background: rgba(76, 208, 125, 0.2);
+      border-color: rgba(76, 208, 125, 0.5);
+      box-shadow: 0 12px 35px rgba(76,208,125,0.25);
+    }
+
+    footer {
+      z-index: 1;
+      margin-top: 50px;
+      font-size: 0.78em;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="cnv"></canvas>
+
+  <div class="hero">
+    <div class="badge">🌱 Proyectos del Campo</div>
+    <h1 class="hero-title">Proyectos<br>Agrícolas</h1>
+    <p class="hero-sub">Soluciones de maquinaria y tecnología para el sector rural. Conoce nuestros servicios.</p>
+  </div>
+
+  <nav class="menu">
+    <a href="Costos.html" class="btn">
+      <span class="icon">💰</span>
+      Costos de Proyectos
+    </a>
+    <a href="Ployectos.html" class="btn">
+      <span class="icon">🚜</span>
+      Tipos de Proyectos
+    </a>
+    <a href="Horario.html" class="btn">
+      <span class="icon">📅</span>
+      Horario e Información
+    </a>
+  </nav>
+
+  <footer>© 2025 Proyectos Agrícolas — Juan Sebastián Román</footer>
+
+  <script>
+    const canvas = document.getElementById('cnv');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+
+    function randomBetween(a, b) { return a + Math.random() * (b - a); }
+
+    function createParticle() {
+      return {
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: randomBetween(1.5, 4),
+        dx: randomBetween(-0.4, 0.4),
+        dy: randomBetween(-0.7, -0.2),
+        alpha: randomBetween(0.3, 0.8),
+        dAlpha: randomBetween(-0.003, 0.003),
+        color: ['#4cd07d','#a8e6b8','#ffffff','#2eb85c'][Math.floor(Math.random()*4)]
+      };
+    }
+
+    function init() {
+      resize();
+      particles = [];
+      for (let i = 0; i < 110; i++) particles.push(createParticle());
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (let p of particles) {
+        p.x += p.dx;
+        p.y += p.dy;
+        p.alpha += p.dAlpha;
+        if (p.alpha < 0.1) p.dAlpha *= -1;
+        if (p.alpha > 0.85) p.dAlpha *= -1;
+        if (p.y < -10) { p.y = H + 5; p.x = Math.random() * W; }
+        if (p.x < -10 || p.x > W + 10) { p.x = Math.random() * W; p.y = H; }
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.restore();
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', init);
+    init();
+    draw();
+  </script>
+</body>
+</html>

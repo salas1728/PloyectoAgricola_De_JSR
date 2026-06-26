@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Proyectos — Juan Sebastián Román</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #0a2e1a 0%, #0d4a2a 50%, #1a6e3e 100%);
+      color: #fff;
+      padding: 30px 16px 80px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+
+    /* ── BACK ── */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.85em;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: #fff; }
+
+    /* ── HEADER ── */
+    .page-header { text-align: center; margin-bottom: 60px; }
+    .badge {
+      display: inline-block;
+      background: rgba(76,208,125,0.15);
+      border: 1px solid rgba(76,208,125,0.35);
+      border-radius: 50px;
+      padding: 5px 18px;
+      font-size: 0.72em;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #a8e6b8;
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6vw, 3.8rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #a8e6b8 60%, #4cd07d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .page-header .subtitle {
+      font-size: 0.95em;
+      font-weight: 300;
+      color: rgba(255,255,255,0.55);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* ── DIVISOR ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 50px 0 28px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(168,230,184,0.2);
+    }
+    .divider-label {
+      font-size: 0.72em;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #4cd07d;
+      white-space: nowrap;
+    }
+
+    /* ── TARJETA DE PROYECTO (la que llenarás) ── */
+    .project-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 22px;
+      padding: 32px 36px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: linear-gradient(180deg, #4cd07d, #a8e6b8);
+      border-radius: 4px 0 0 4px;
+    }
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 45px rgba(0,0,0,0.35);
+    }
+
+    /* Número del proyecto */
+    .project-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5em;
+      font-weight: 700;
+      color: rgba(76,208,125,0.15);
+      position: absolute;
+      top: 16px; right: 24px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* Etiqueta tipo */
+    .project-tag {
+      display: inline-block;
+      background: rgba(76,208,125,0.15);
+      border: 1px solid rgba(76,208,125,0.3);
+      color: #a8e6b8;
+      font-size: 0.72em;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 50px;
+      margin-bottom: 12px;
+    }
+
+    /* Título del proyecto */
+    .project-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    /* Subtítulo opcional */
+    .project-subtitle {
+      font-size: 0.88em;
+      font-weight: 600;
+      color: #4cd07d;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Cuerpo de texto */
+    .project-body {
+      font-size: 0.95em;
+      font-weight: 300;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* Datos en fila */
+    .project-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label {
+      font-size: 0.68em;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    .meta-value {
+      font-size: 0.9em;
+      font-weight: 600;
+      color: #a8e6b8;
+    }
+
+    /* ── MEDIA (foto o video) ── */
+    .project-media {
+      margin-top: 22px;
+    }
+
+    .project-media img {
+      width: 100%;
+      border-radius: 14px;
+      object-fit: cover;
+      max-height: 300px;
+      display: block;
+      opacity: 0.9;
+      transition: opacity 0.3s;
+    }
+    .project-media img:hover { opacity: 1; }
+
+    .project-media video {
+      width: 100%;
+      border-radius: 14px;
+      display: block;
+      max-height: 340px;
+      background: #000;
+    }
+
+    .media-caption {
+      margin-top: 8px;
+      font-size: 0.75em;
+      color: rgba(255,255,255,0.35);
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* ── NOTA EDITORIAL ── */
+    .editor-note {
+      background: rgba(76,208,125,0.07);
+      border: 1px dashed rgba(76,208,125,0.25);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 0.8em;
+      color: rgba(168,230,184,0.6);
+      font-style: italic;
+      margin-top: 10px;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="cnv"></canvas>
+
+  <div class="content">
+    <a href="index.html" class="back-btn">← Regresar al inicio</a>
+
+    <div class="page-header">
+      <div class="badge">🚜 Expediente</div>
+      <h1>Proyectos de<br>Juan Sebastián Román</h1>
+      <p class="subtitle">Cada proyecto es una solución diseñada para el campo. Innovación, experiencia y resultados.</p>
+    </div>
+
+    <!-- ════════════════════════════════
+         ✏️ INSTRUCCIONES:
+         Cada <div class="project-card"> es un proyecto.
+         Rellena los textos marcados con ✏️.
+         Puedes duplicar tarjetas para más proyectos.
+         ════════════════════════════════ -->
+
+    <div class="divider"><span class="divider-label">📌 Proyectos En Curso</span></div>
+
+    <!-- PROYECTO 1 -->
+    <div class="project-card">
+      <span class="project-num">01</span>
+      <div class="project-tag">✏️ Tipo de proyecto</div>
+      <h2 class="project-title">✏️ Nombre del Proyecto</h2>
+      <p class="project-subtitle">✏️ Subtítulo breve o eslogan del proyecto</p>
+      <p class="project-body">
+        ✏️ Descripción completa del proyecto.
+      </p>
+
+      <!-- ── MEDIA PROYECTO 1 ──────────────────────────────────────
+           FOTO:  quita los comentarios de la etiqueta <img> y pon la ruta de tu imagen.
+           VIDEO: quita los comentarios de la etiqueta <video> y pon la ruta de tu video.
+           Solo descomenta UNO de los dos bloques (foto O video).
+           El pie de foto/video es opcional — bórralo si no lo necesitas.
+      ──────────────────────────────────────────────────────────── -->
+      <div class="project-media">
+
+        <!-- 📷 FOTO -->
+        <!-- <img src="foto-proyecto-1.jpg" alt="Foto del proyecto 1"/> -->
+
+        <!-- 🎥 VIDEO -->
+        <!--
+        <video controls>
+          <source src="video-proyecto-1.mp4" type="video/mp4"/>
+          Tu navegador no soporta video HTML5.
+        </video>
+        -->
+
+        <!-- <p class="media-caption">✏️ Pie de foto o video (opcional)</p> -->
+      </div>
+
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Zona</span>
+          <span class="meta-value">✏️ Región / Estado</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Hectáreas</span>
+          <span class="meta-value">✏️ 000 ha</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Duración</span>
+          <span class="meta-value">✏️ X semanas / meses</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Estado</span>
+          <span class="meta-value">✏️ En curso / Completado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROYECTO 2 -->
+    <div class="project-card">
+      <span class="project-num">02</span>
+      <div class="project-tag">✏️ Tipo de proyecto</div>
+      <h2 class="project-title">✏️ Nombre del Proyecto</h2>
+      <p class="project-subtitle">✏️ Subtítulo breve o eslogan del proyecto</p>
+      <p class="project-body">
+        ✏️ Descripción del segundo proyecto.
+      </p>
+
+      <!-- ── MEDIA PROYECTO 2 ──────────────────────────────────────
+           FOTO:  quita los comentarios de la etiqueta <img> y pon la ruta de tu imagen.
+           VIDEO: quita los comentarios de la etiqueta <video> y pon la ruta de tu video.
+           Solo descomenta UNO de los dos bloques (foto O video).
+      ──────────────────────────────────────────────────────────── -->
+      <div class="project-media">
+
+        <!-- 📷 FOTO -->
+        <!-- <img src="foto-proyecto-2.jpg" alt="Foto del proyecto 2"/> -->
+
+        <!-- 🎥 VIDEO -->
+        <!--
+        <video controls>
+          <source src="video-proyecto-2.mp4" type="video/mp4"/>
+          Tu navegador no soporta video HTML5.
+        </video>
+        -->
+
+        <!-- <p class="media-caption">✏️ Pie de foto o video (opcional)</p> -->
+      </div>
+
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Zona</span>
+          <span class="meta-value">✏️ Región / Estado</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Hectáreas</span>
+          <span class="meta-value">✏️ 000 ha</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Duración</span>
+          <span class="meta-value">✏️ X semanas / meses</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Estado</span>
+          <span class="meta-value">✏️ En curso / Completado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROYECTO 3 -->
+    <div class="project-card">
+      <span class="project-num">03</span>
+      <div class="project-tag">✏️ Tipo de proyecto</div>
+      <h2 class="project-title">✏️ Nombre del Proyecto</h2>
+      <p class="project-subtitle">✏️ Subtítulo breve o eslogan del proyecto</p>
+      <p class="project-body">
+        ✏️ Descripción del tercer proyecto.
+      </p>
+
+      <!-- ── MEDIA PROYECTO 3 ──────────────────────────────────────
+           FOTO:  quita los comentarios de la etiqueta <img> y pon la ruta de tu imagen.
+           VIDEO: quita los comentarios de la etiqueta <video> y pon la ruta de tu video.
+           Solo descomenta UNO de los dos bloques (foto O video).
+      ──────────────────────────────────────────────────────────── -->
+      <div class="project-media">
+
+        <!-- 📷 FOTO -->
+        <!-- <img src="foto-proyecto-3.jpg" alt="Foto del proyecto 3"/> -->
+
+        <!-- 🎥 VIDEO -->
+        <!--
+        <video controls>
+          <source src="video-proyecto-3.mp4" type="video/mp4"/>
+          Tu navegador no soporta video HTML5.
+        </video>
+        -->
+
+        <!-- <p class="media-caption">✏️ Pie de foto o video (opcional)</p> -->
+      </div>
+
+      <div class="project-meta">
+        <div class="meta-item">
+          <span class="meta-label">Zona</span>
+          <span class="meta-value">✏️ Región / Estado</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Hectáreas</span>
+          <span class="meta-value">✏️ 000 ha</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Duración</span>
+          <span class="meta-value">✏️ X semanas / meses</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Estado</span>
+          <span class="meta-value">✏️ En curso / Completado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✏️ AGREGA MÁS PROYECTOS COPIANDO UNA TARJETA COMPLETA DESDE project-card hasta /project-card -->
+
+    
+
+  </div><!-- /content -->
+
+  <script>
+    const canvas = document.getElementById('cnv');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    function makeP() {
+      return {
+        x: Math.random()*W, y: Math.random()*H,
+        r: 1.5+Math.random()*3,
+        dx: (Math.random()-0.5)*0.5, dy: -(0.2+Math.random()*0.5),
+        alpha: 0.3+Math.random()*0.5, dA: (Math.random()-0.5)*0.004,
+        color: ['#4cd07d','#a8e6b8','#ffffff'][Math.floor(Math.random()*3)]
+      };
+    }
+    function init() { resize(); particles = Array.from({length:100}, makeP); }
+    function loop() {
+      ctx.clearRect(0,0,W,H);
+      for (const p of particles) {
+        p.x+=p.dx; p.y+=p.dy; p.alpha+=p.dA;
+        if (p.alpha<0.1||p.alpha>0.85) p.dA*=-1;
+        if (p.y<-10) { p.y=H+5; p.x=Math.random()*W; }
+        if (p.x<-10||p.x>W+10) { p.x=Math.random()*W; p.y=H; }
+        ctx.save(); ctx.globalAlpha=p.alpha;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.color; ctx.fill(); ctx.restore();
+      }
+      requestAnimationFrame(loop);
+    }
+    window.addEventListener('resize', init);
+    init(); loop();
+  </script>
+</body>
+</html>
